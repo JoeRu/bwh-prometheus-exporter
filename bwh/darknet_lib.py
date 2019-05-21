@@ -1,46 +1,3 @@
-from prometheus_client import start_http_server, Summary
-import random
-import time
-from prometheus_client import Gauge
-import urllib.request
-import glob
-
-bees    = Gauge('count_of_bees', 'Count of Bees')
-wasps   = Gauge('count_of_wasps', 'Count of Wasps')
-hornets = Gauge('count_of_hornets', 'Count of Hornets')
-
-REQUEST_TIME = Gauge('request_processing_seconds', 'Time spent processing request')
-
-
-netMain = None
-metaMain = None
-altNames = None
-
-# Decorate function with metric.
-@REQUEST_TIME.time()
-def process_request():
-	"""Get an Image from webcam and count objects"""
-#	(filename, headers) = urllib.request.urlretrieve("https://home.jru.me/bee-cam/api.cgi?cmd=Snap&channel=0&rs=sdilj23SDO3DDGHJsdfs&user=guest&password=my_guest&1555017246")
-	current_dir = os.path.dirname(os.path.abspath(__file__))
-	file_list = glob.glob(os.path.join(current_dir,'randmom', "*.jpg"))
-	random.shuffle(file_list)
-	filename = file_list[0]
-	print(filename)
-	detections = performDetect(imagePath=filename)
-	print(detections)
-	bees_ = []
-	wasps_ = []
-	hornets_ = []
-	result_objects = {
-	    b'bee': bees_,
-	    b'wasp': wasps_,
-	    b'hornet': hornets_
-	}
-	for (object, propability, box ) in detections:
-		(result_objects.get(object)).append((propability, box))
-	bees.set(len(bees_))
-	wasps.set(len(wasps_))
-	hornets.set(len(hornets_))
 
 """
 Python 3 wrapper for identifying objects in images
@@ -67,14 +24,18 @@ Original *nix 2.7: https://github.com/pjreddie/darknet/blob/0f110834f4e18b30d5f1
 Windows Python 2.7 version: https://github.com/AlexeyAB/darknet/blob/fc496d52bf22a0bb257300d3c79be9cd80e722cb/build/darknet/x64/darknet.py
 
 Initial Author; adapted out of darknet.py
-@author: Philip Kahn
-@date: 20180503
+@author: Philip Kahn, adaptions Johannes Rumpf
+@date: 20180503, 20190523
 """
 #pylint: disable=R, W0401, W0614, W0703
 from ctypes import *
 import math
 import random
 import os
+
+netMain = None
+metaMain = None
+altNames = None
 
 def sample(probs):
     s = sum(probs)
@@ -118,8 +79,6 @@ class METADATA(Structure):
 
 
 
-#lib = CDLL("/home/pjreddie/documents/darknet/libdarknet.so", RTLD_GLOBAL)
-#lib = CDLL("libdarknet.so", RTLD_GLOBAL)
 hasGPU = True
 if os.name == "nt":
     cwd = os.path.dirname(__file__)
@@ -423,15 +382,3 @@ def performDetect(imagePath="test.jpg", thresh= 0.45, configPath = "./cfg/bwh.cf
     #detections = detect(netMain, metaMain, imagePath, thresh)	# if is used cv2.imread(image)
     detections = detect(netMain, metaMain, imagePath.encode("ascii"), thresh)
     return detections
-
-import time
-if __name__ == '__main__':
-	#init the weighted network for performance-reasons - only at startup
-    performDetect(initOnly=True)
-    # Start up the server to expose the metrics.
-    start_http_server(8004)
-
-    # Generate some requests. hmpf - ich will das auf request gezählt wird - das ist so doof... irgendwie
-    while True:
-			   time.sleep(5)
-			   process_request()
