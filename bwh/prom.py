@@ -2,7 +2,7 @@ import time
 import random
 from prometheus_client import Metric
 import bwh_exporter
-
+#MetricWrapperBase
 class Collector(object):
     def __init__(self, endpoint, service, exclude=list):
         self._endpoint = endpoint
@@ -18,15 +18,9 @@ class Collector(object):
         return {k: v for k, v in metrics.items() if k not in self._exclude}
 
     def _get_metrics(self):
-#        metrics = {
-#            'requests': 100,
-#            'requests_status_2xx': 90,
-#            'requests_status_4xx': 3,
-#            'requests_status_5xx': 7,
-#            'uptime_sec': 123,
-#            'exclude_me': 1234,
-#            }
+        # Here starts the MAGIC - Process Image and result bees, wasps and hornets found
         metrics = bwh_exporter.process_request()
+
         if self._exclude:
             metrics = self.filter_exclude(metrics)
 

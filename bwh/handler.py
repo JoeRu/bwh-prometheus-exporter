@@ -6,7 +6,6 @@ from prometheus_client.exposition import generate_latest
 
 from prom import Collector
 
-
 class metricHandler:
     def __init__(self, url='', service='', exclude=list, webcam=''):
         self._service = service
