@@ -9,7 +9,7 @@ import skimage
 import numpy as np
 
 #Use 'Random' Folder to detect images
-_DEBUG = True
+_DEBUG = False
 
 import argparse
 
@@ -33,7 +33,7 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 
 # create file handler which logs even debug messages
-fh = logging.FileHandler('imageai-bwh.log')
+fh = logging.FileHandler(os.path.basename(__file__)+'.log')
 fh.setLevel(logging.ERROR)
 
 # create formatter and add it to the handlers

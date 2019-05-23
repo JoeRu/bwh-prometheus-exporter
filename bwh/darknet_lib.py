@@ -38,6 +38,31 @@ netMain = None
 metaMain = None
 altNames = None
 
+import logging
+#-------------Output Logger
+# create logger
+logger = logging.getLogger(os.path.basename(__file__))
+#logger.setLevel(logging.INFO)
+logger.setLevel(logging.INFO)
+# create console handler with a higher log level
+ch = logging.StreamHandler()
+#ch.setLevel(logging.INFO)
+ch.setLevel(logging.INFO)
+
+# create file handler which logs even debug messages
+fh = logging.FileHandler(os.path.basename(__file__)+'.log')
+fh.setLevel(logging.ERROR)
+
+# create formatter and add it to the handlers
+#formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter('%(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+ch.setFormatter(formatter)
+# add the handlers to the logger
+logger.addHandler(fh)
+logger.addHandler(ch)
+
+
 def sample(probs):
     s = sum(probs)
     probs = [a/s for a in probs]
@@ -95,7 +120,7 @@ if os.name == "nt":
             if tmp in ["1", "true", "yes", "on"]:
                 raise ValueError("ForceCPU")
             else:
-                print("Flag value '"+tmp+"' not forcing CPU mode")
+                logger.info("Flag value '"+tmp+"' not forcing CPU mode")
         except KeyError:
             # We never set the flag
             if 'CUDA_VISIBLE_DEVICES' in envKeys:
@@ -107,8 +132,8 @@ if os.name == "nt":
                     raise ValueError("ForceCPU")
             except NameError:
                 pass
-            # print(os.environ.keys())
-            # print("FORCE_CPU flag undefined, proceeding with GPU")
+            # logger.info(os.environ.keys())
+            # logger.info("FORCE_CPU flag undefined, proceeding with GPU")
         if not os.path.exists(winGPUdll):
             raise ValueError("NoDLL")
         lib = CDLL(winGPUdll, RTLD_GLOBAL)
@@ -116,12 +141,12 @@ if os.name == "nt":
         hasGPU = False
         if os.path.exists(winNoGPUdll):
             lib = CDLL(winNoGPUdll, RTLD_GLOBAL)
-            print("Notice: CPU-only mode")
+            logger.info("Notice: CPU-only mode")
         else:
             # Try the other way, in case no_gpu was
             # compile but not renamed
             lib = CDLL(winGPUdll, RTLD_GLOBAL)
-            print("Environment variables indicated a CPU run, but we didn't find `"+winNoGPUdll+"`. Trying a GPU run anyway.")
+            logger.info("Environment variables indicated a CPU run, but we didn't find `"+winNoGPUdll+"`. Trying a GPU run anyway.")
 else:
     lib = CDLL("./libdarknet.so", RTLD_GLOBAL)
 
@@ -231,19 +256,19 @@ def classify(net, meta, im):
     res = sorted(res, key=lambda x: -x[1])
     return res
 
-def detect(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45, debug= False):
+def detect(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45):
     """
     Performs the meat of the detection
     """
     #pylint: disable= C0321
     im = load_image(image, 0, 0)
-    if debug: print("Loaded image")
-    ret = detect_image(net, meta, im, thresh, hier_thresh, nms, debug)
+    logger.debug("Loaded image")
+    ret = detect_image(net, meta, im, thresh, hier_thresh, nms)
     free_image(im)
-    if debug: print("freed image")
+    logger.debug("freed image")
     return ret
 
-def detect_image(net, meta, im, thresh=.5, hier_thresh=.5, nms=.45, debug= False):
+def detect_image(net, meta, im, thresh=.5, hier_thresh=.5, nms=.45):
     #import cv2
     #custom_image_bgr = cv2.imread(image) # use: detect(,,imagePath,)
     #custom_image = cv2.cvtColor(custom_image_bgr, cv2.COLOR_BGR2RGB)
@@ -252,43 +277,42 @@ def detect_image(net, meta, im, thresh=.5, hier_thresh=.5, nms=.45, debug= False
     #custom_image = scipy.misc.imread(image)
     #im, arr = array_to_image(custom_image)		# you should comment line below: free_image(im)
     num = c_int(0)
-    if debug: print("Assigned num")
+    logger.debug("Assigned num")
     pnum = pointer(num)
-    if debug: print("Assigned pnum")
+    logger.debug("Assigned pnum")
     predict_image(net, im)
-    if debug: print("did prediction")
+    logger.debug("did prediction")
     #dets = get_network_boxes(net, custom_image_bgr.shape[1], custom_image_bgr.shape[0], thresh, hier_thresh, None, 0, pnum, 0) # OpenCV
     dets = get_network_boxes(net, im.w, im.h, thresh, hier_thresh, None, 0, pnum, 0)
-    if debug: print("Got dets")
+    logger.debug("Got dets")
     num = pnum[0]
-    if debug: print("got zeroth index of pnum")
+    logger.debug("got zeroth index of pnum")
     if nms:
         do_nms_sort(dets, num, meta.classes, nms)
-    if debug: print("did sort")
+    logger.debug("did sort")
     res = []
-    if debug: print("about to range")
+    logger.debug("about to range")
     for j in range(num):
-        if debug: print("Ranging on "+str(j)+" of "+str(num))
-        if debug: print("Classes: "+str(meta), meta.classes, meta.names)
+        logger.debug("Ranging on "+str(j)+" of "+str(num))
+        logger.debug("Classes: {},{},{}".format(str(meta), meta.classes, meta.names))
         for i in range(meta.classes):
-            if debug: print("Class-ranging on "+str(i)+" of "+str(meta.classes)+"= "+str(dets[j].prob[i]))
+            logger.debug("Class-ranging on "+str(i)+" of "+str(meta.classes)+"= "+str(dets[j].prob[i]))
             if dets[j].prob[i] > 0:
                 b = dets[j].bbox
                 if altNames is None:
                     nameTag = meta.names[i]
                 else:
                     nameTag = altNames[i]
-                if debug:
-                    print("Got bbox", b)
-                    print(nameTag)
-                    print(dets[j].prob[i])
-                    print((b.x, b.y, b.w, b.h))
+                logger.debug("Got bbox {}".format(b))
+                logger.debug(nameTag)
+                logger.debug(dets[j].prob[i])
+                logger.debug((b.x, b.y, b.w, b.h))
                 res.append((nameTag, dets[j].prob[i], (b.x, b.y, b.w, b.h)))
-    if debug: print("did range")
+    logger.debug("did range")
     res = sorted(res, key=lambda x: -x[1])
-    if debug: print("did sort")
+    logger.debug("did sort")
     free_detections(dets, num)
-    if debug: print("freed detections")
+    logger.debug("freed detections")
     return res
 
 
@@ -375,7 +399,7 @@ def performDetect(imagePath="test.jpg", thresh= 0.45, configPath = "./cfg/bwh.cf
         except Exception:
             pass
     if initOnly:
-        print("Initialized detector")
+        logger.info("Initialized detector")
         return None
     if not os.path.exists(imagePath):
         raise ValueError("Invalid image path `"+os.path.abspath(imagePath)+"`")
@@ -392,14 +416,14 @@ def make_image(imagePath, detections):
         returns "image": a numpy array representing an image, compatible with scikit-image
     """
     image = io.imread(imagePath)
-    print("*** "+str(len(detections))+" Results, color coded by confidence ***")
+    logger.info("*** "+str(len(detections))+" Results, color coded by confidence ***")
     imcaption = []
     for detection in detections:
         label = detection[0]
         confidence = detection[1]
         pstring = str(label.decode("ascii"))+": "+str(np.rint(100 * confidence))+"%"
         imcaption.append(pstring)
-        print(pstring)
+        logger.info(pstring)
         bounds = detection[2]
         shape = image.shape
         yExtent = int(bounds[3])
