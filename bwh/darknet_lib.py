@@ -383,3 +383,49 @@ def performDetect(imagePath="test.jpg", thresh= 0.45, configPath = "./cfg/bwh.cf
     #detections = detect(netMain, metaMain, imagePath, thresh)	# if is used cv2.imread(image)
     detections = detect(netMain, metaMain, imagePath.encode("ascii"), thresh)
     return detections
+
+from skimage import io, draw
+import numpy as np
+
+def make_image(imagePath, detections):
+    image = io.imread(imagePath)
+    print("*** "+str(len(detections))+" Results, color coded by confidence ***")
+    imcaption = []
+    for detection in detections:
+        label = detection[0]
+        confidence = detection[1]
+        pstring = label+": "+str(np.rint(100 * confidence))+"%"
+        imcaption.append(pstring)
+        print(pstring)
+        bounds = detection[2]
+        shape = image.shape
+        yExtent = int(bounds[3])
+        xEntent = int(bounds[2])
+        # Coordinates are around the center
+        xCoord = int(bounds[0] - bounds[2]/2)
+        yCoord = int(bounds[1] - bounds[3]/2)
+        boundingBox = [
+            [xCoord, yCoord],
+            [xCoord, yCoord + yExtent],
+            [xCoord + xEntent, yCoord + yExtent],
+            [xCoord + xEntent, yCoord]
+        ]
+        # Wiggle it around to make a 3px border
+        rr, cc = draw.polygon_perimeter([x[1] for x in boundingBox], [x[0] for x in boundingBox], shape= shape)
+        rr2, cc2 = draw.polygon_perimeter([x[1] + 1 for x in boundingBox], [x[0] for x in boundingBox], shape= shape)
+        rr3, cc3 = draw.polygon_perimeter([x[1] - 1 for x in boundingBox], [x[0] for x in boundingBox], shape= shape)
+        rr4, cc4 = draw.polygon_perimeter([x[1] for x in boundingBox], [x[0] + 1 for x in boundingBox], shape= shape)
+        rr5, cc5 = draw.polygon_perimeter([x[1] for x in boundingBox], [x[0] - 1 for x in boundingBox], shape= shape)
+        boxColor = (int(255 * (1 - (confidence ** 2))), int(255 * (confidence ** 2)), 0)
+        draw.set_color(image, (rr, cc), boxColor, alpha= 0.8)
+        draw.set_color(image, (rr2, cc2), boxColor, alpha= 0.8)
+        draw.set_color(image, (rr3, cc3), boxColor, alpha= 0.8)
+        draw.set_color(image, (rr4, cc4), boxColor, alpha= 0.8)
+        draw.set_color(image, (rr5, cc5), boxColor, alpha= 0.8)
+
+    detections = {
+        "detections": detections,
+        "image": image,
+        "caption": "\n<br/>".join(imcaption)
+        }
+    return detections

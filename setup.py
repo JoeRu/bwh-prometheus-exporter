@@ -23,7 +23,7 @@ class install(_install):
 
 setup(
     name='bwh-prometheus-exporter',
-    version='0.0.0',
+    version='0.4.0',
     author=u'Johannes Rumpf',
     author_email='johannes.rumpf@gmail.com',
     description='webcam : bee, wasp, hornet detector and metrics exporter',
@@ -32,7 +32,7 @@ setup(
     install_requires=requirements,
     cmdclass={'install': install},
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Intended Audience :: Developers',
         'Operating System :: POSIX :: Linux',

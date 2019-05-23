@@ -1,4 +1,4 @@
 prometheus_client
 requests==2.10.0
-click>=6.6
-falcon
+skimage
+numpy
