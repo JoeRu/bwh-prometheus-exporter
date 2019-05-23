@@ -4,3 +4,4 @@ random/
 *.pyc
 __pycache__/
 ._*
+.log

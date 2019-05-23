@@ -5,9 +5,11 @@ import glob
 import darknet_lib
 import os
 from prometheus_client import Gauge, MetricsHandler, start_http_server
+import skimage
+import numpy as np
 
 #Use 'Random' Folder to detect images
-_DEBUG = False
+_DEBUG = True
 
 import argparse
 
@@ -77,6 +79,8 @@ def process_request():
 
 	detections = darknet_lib.performDetect(imagePath=filename)
 	logger.debug(detections)
+
+	skimage.io.imsave('output.jpg',darknet_lib.make_image(imagePath=filename,detections=detections),quality=90)
 
 	bees_ = []
 	wasps_ = []

@@ -388,13 +388,16 @@ from skimage import io, draw
 import numpy as np
 
 def make_image(imagePath, detections):
+    """
+        returns "image": a numpy array representing an image, compatible with scikit-image
+    """
     image = io.imread(imagePath)
     print("*** "+str(len(detections))+" Results, color coded by confidence ***")
     imcaption = []
     for detection in detections:
         label = detection[0]
         confidence = detection[1]
-        pstring = label+": "+str(np.rint(100 * confidence))+"%"
+        pstring = str(label.decode("ascii"))+": "+str(np.rint(100 * confidence))+"%"
         imcaption.append(pstring)
         print(pstring)
         bounds = detection[2]
@@ -423,9 +426,4 @@ def make_image(imagePath, detections):
         draw.set_color(image, (rr4, cc4), boxColor, alpha= 0.8)
         draw.set_color(image, (rr5, cc5), boxColor, alpha= 0.8)
 
-    detections = {
-        "detections": detections,
-        "image": image,
-        "caption": "\n<br/>".join(imcaption)
-        }
-    return detections
+    return image
