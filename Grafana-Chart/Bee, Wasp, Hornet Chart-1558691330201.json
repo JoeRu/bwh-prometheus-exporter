@@ -1,19 +1,4 @@
 {
-  "__inputs": [],
-  "__requires": [
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "6.1.6"
-    },
-    {
-      "type": "panel",
-      "id": "graph",
-      "name": "Graph",
-      "version": ""
-    }
-  ],
   "annotations": {
     "list": [
       {
@@ -30,7 +15,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": null,
+  "id": 6,
   "links": [],
   "panels": [
     {
@@ -48,11 +33,9 @@
       },
       "id": 2,
       "legend": {
-        "avg": true,
+        "avg": false,
         "current": true,
-        "hideEmpty": false,
-        "hideZero": true,
-        "max": true,
+        "max": false,
         "min": false,
         "show": true,
         "total": false,
@@ -91,6 +74,13 @@
           "intervalFactor": 1,
           "legendFormat": "Hornets",
           "refId": "C"
+        },
+        {
+          "expr": "avg_over_time(count_of_bees[10m])",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "10 Minute Ø - Bee",
+          "refId": "D"
         }
       ],
       "thresholds": [
@@ -151,7 +141,7 @@
     "list": []
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-6h",
     "to": "now"
   },
   "timepicker": {
@@ -182,5 +172,5 @@
   "timezone": "",
   "title": "Bee, Wasp, Hornet Chart",
   "uid": "6wTStaZZk",
-  "version": 2
+  "version": 5
 }
