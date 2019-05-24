@@ -17,10 +17,12 @@ import argparse
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('-p', '--port', type=int, required=True, help='Port to use')
 parser.add_argument('-w', '--webcam', default='https://home.jru.me/bee-cam/api.cgi?cmd=Snap&channel=0&rs=sdilj23SDO3DDGHJsdfs&user=guest&password=my_guest&1555017246',required=True, type=str, help='webcam or picture-source to collect images from')
+parser.add_argument('-o', '--output_img', default='output.jpg', type=str, help='Location and Filename of output.jpg')
 
 args = parser.parse_args()
 webcam = args.webcam
 port = args.port
+output = args.output_img
 # ----------------------------
 
 
@@ -85,7 +87,7 @@ def process_request():
 	detections = darknet_lib.performDetect(imagePath=filename)
 	logger.debug(detections)
 	# TODO: input-argument to save optional and to save to given path
-	skimage.io.imsave('output.jpg',darknet_lib.make_image(imagePath=filename,detections=detections),quality=90)
+	skimage.io.imsave(output,darknet_lib.make_image(imagePath=filename,detections=detections),quality=90)
 
 	bees_ = []
 	wasps_ = []

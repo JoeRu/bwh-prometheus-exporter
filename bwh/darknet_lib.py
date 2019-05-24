@@ -317,7 +317,7 @@ def detect_image(net, meta, im, thresh=.5, hier_thresh=.5, nms=.45):
 
 
 
-def performDetect(imagePath="test.jpg", thresh= 0.45, configPath = "./cfg/bwh.cfg", weightPath = "./cfg/bwh.weights", metaPath= "./cfg/bwh.data", showImage= False, makeImageOnly = False, initOnly= False):
+def performDetect(imagePath="test.jpg", thresh= 0.35, configPath = "./cfg/bwh.cfg", weightPath = "./cfg/bwh.weights", metaPath= "./cfg/bwh.data", showImage= False, makeImageOnly = False, initOnly= False):
     """
     Convenience function to handle the detection and returns of objects.
 

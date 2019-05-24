@@ -1,6 +1,6 @@
 # Bee, Wasp, Hornet - Prometheus-Exporter
-This Project counts bees, wasps and hornets and delivers it for the use in [Prometheus](https://prometheus.io/).
-On Prometheus base charting and alarming (f.e. Swarm-alarming or Wasp-alarming) can be implemented.
+This Project counts bees, wasps and hornets and delivers it to [Prometheus](https://prometheus.io/).
+On Prometheus-base charting and alarming (f.e. Swarm-alarming or Wasp-alarming) can be implemented.
 ![Grafana-Chart](bee-wasp-hornet-chart.png)
 
 
@@ -32,7 +32,7 @@ This will clone, and build darknet-lib file and install python requirements (fro
 Actual there is no Daemon-Mode. One option may be to run it via linux "screen" command; .
 
 ```shell
-Usage: bwh/bwh_exporter.py [OPTIONS]
+Usage: python bwh/bwh_exporter.py [OPTIONS]
 
 Options:
   -p, --port INTEGER  Port to use  [required]
