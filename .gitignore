@@ -1,6 +1,5 @@
 darknet/
 libdarknet.so
-random/
 *.pyc
 __pycache__/
 ._*
