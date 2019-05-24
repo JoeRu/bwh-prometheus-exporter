@@ -45,3 +45,9 @@ Options:
 
 # Notes
 Metrics can be accessed with browser by `<host>:<port>/metrics`. If user/password access is required - please check for Documentation of (prometheus-python-exporter)[https://github.com/prometheus/client_python] and adapt bwh-exporter.py.
+
+Please note that using this code is some sort of CPU and Memory-Consuming. This are some stats for a XEON 6-core, 32GB Memory System.
+```
+%MEM %CPU COMMAND
+ 0.7  7.9 python bwh/bwh_exporter.py -p ... -w ...
+ ```
