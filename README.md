@@ -1,6 +1,20 @@
 # Bee, Wasp, Hornet - Prometheus-Exporter
+This Project counts bees, wasps and hornets and delivers it for the use in [Prometheus](https://prometheus.io/).
+On Prometheus base charting and alarming (f.e. Swarm-alarming or Wasp-alarming) can be implemented.
+![Grafana-Chart](bee-wasp-hornet-chart.png)
+
+
+![recognition-example](output_example.png)
+
+
+# Basic-Implementation Guide
+
 
 ## Requirements
+* a Webcam to take photos of a bee-hive entry:
+  - a good resolution is strongly recommended.
+  - the ability to get an picture (network, power).
+
 * A Build-Environment that allows to `git clone https://github.com/AlexeyAB/darknet`
 and to build it with `make`. Please check also with the requirements of darknet.
 

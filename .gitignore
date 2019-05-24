@@ -4,3 +4,4 @@ libdarknet.so
 __pycache__/
 ._*
 *.log
+output.jpg
