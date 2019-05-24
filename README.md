@@ -4,7 +4,7 @@ On Prometheus base charting and alarming (f.e. Swarm-alarming or Wasp-alarming) 
 ![Grafana-Chart](bee-wasp-hornet-chart.png)
 
 
-![recognition-example](output_example.png)
+![recognition-example](output_example.jpg)
 
 
 # Basic-Implementation Guide
