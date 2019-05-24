@@ -12,7 +12,8 @@ import numpy as np
 _DEBUG = False
 
 import argparse
-
+# input arguments
+# ----------------------------
 parser = argparse.ArgumentParser(description='')
 parser.add_argument('-p', '--port', type=int, required=True, help='Port to use')
 parser.add_argument('-w', '--webcam', default='https://home.jru.me/bee-cam/api.cgi?cmd=Snap&channel=0&rs=sdilj23SDO3DDGHJsdfs&user=guest&password=my_guest&1555017246',required=True, type=str, help='webcam or picture-source to collect images from')
@@ -20,17 +21,19 @@ parser.add_argument('-w', '--webcam', default='https://home.jru.me/bee-cam/api.c
 args = parser.parse_args()
 webcam = args.webcam
 port = args.port
+# ----------------------------
+
 
 import logging
-#-------------Output Logger
+#-------------Logging facilities - to get more Output setLevel(logging.DEBUG) less for setLevel(logging.WARN)
 # create logger
 logger = logging.getLogger(os.path.basename(__file__))
 #logger.setLevel(logging.INFO)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 # create console handler with a higher log level
 ch = logging.StreamHandler()
 #ch.setLevel(logging.INFO)
-ch.setLevel(logging.DEBUG)
+ch.setLevel(logging.INFO)
 
 # create file handler which logs even debug messages
 fh = logging.FileHandler(os.path.basename(__file__)+'.log')
@@ -44,19 +47,21 @@ ch.setFormatter(formatter)
 # add the handlers to the logger
 logger.addHandler(fh)
 logger.addHandler(ch)
+# -------------------------------
 
-
+# decorator to adapt DO_GET Function of HTTP-Server and calculate bees, wasps and hornets only on request
 from functools import wraps
 def bwh_decorator(f):
 #	@wraps(f)
 	def wrapper(*args, **kwds):
-	 process_request()
+	 process_request() # here works the magic
 	 return f(*args, **kwds)
 	return wrapper
 
 # Safe detected file to location # actual not implemented
 #SAFE_FILE = False
 
+# Counted Objects - for more details please check prometheus docs
 bees    = Gauge('count_of_bees', 'Count of Bees')
 wasps   = Gauge('count_of_wasps', 'Count of Wasps')
 hornets = Gauge('count_of_hornets', 'Count of Hornets')
@@ -79,12 +84,13 @@ def process_request():
 
 	detections = darknet_lib.performDetect(imagePath=filename)
 	logger.debug(detections)
-
+	# TODO: input-argument to save optional and to save to given path
 	skimage.io.imsave('output.jpg',darknet_lib.make_image(imagePath=filename,detections=detections),quality=90)
 
 	bees_ = []
 	wasps_ = []
 	hornets_ = []
+	# Objects are not string - byte-code string
 	result_objects = {
 	    b'bee': bees_,
 	    b'wasp': wasps_,
@@ -92,7 +98,7 @@ def process_request():
 	}
 	for (object, propability, box ) in detections:
 		(result_objects.get(object)).append((propability, box))
-
+	#eventually Histogramm to adapt propabilities in graf? - optional
 	bees.set(len(bees_))
 	wasps.set(len(wasps_))
 	hornets.set(len(hornets_))
@@ -106,4 +112,4 @@ if __name__ == '__main__':
 	# Start up the server to expose the metrics.
 	start_http_server(port)
 
-	input("Press Enter to end...")
+	input("Press 'Enter' to end application / Httpserver works in Background until then...")
