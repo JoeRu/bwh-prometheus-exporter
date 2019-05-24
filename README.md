@@ -44,7 +44,7 @@ Options:
 `python bwh/bwh_exporter.py -p 8004 -w https://home.jru.me/bee-cam/api.cgi\?cmd\=Snap\&channel\=0\&rs\=sdilj23SDO3DDGHJsdfs\&user\=guest\&password\=my_guest\&1555017246`
 
 # Notes
-Metrics can be accessed with browser by `<host>:<port>/metrics`. If user/password access is required - please check for Documentation of [prometheus-python-exporter](https://github.com/prometheus/client_python) and adapt bwh-exporter.py.
+Metrics can be accessed with browser by `<host>:<port>/metrics`. If user/password access is required - please check for Documentation of [prometheus-python-exporter](https://github.com/prometheus/client_python#handlers-for-authentication) and adapt bwh-exporter.py.
 
 Please note that using this code is some sort of CPU and Memory-Consuming. This are some stats for a XEON 6-core, 32GB Memory System.
 ```
