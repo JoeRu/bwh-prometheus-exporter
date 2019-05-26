@@ -5,3 +5,8 @@ __pycache__/
 ._*
 *.log
 output.jpg
+bwh_model.h5
+build/
+kr/
+keras-retinanet/
+keras_retinanet/

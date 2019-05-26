@@ -1,15 +1,24 @@
-from pip.req import parse_requirements
+try: # for pip >= 10
+    from pip._internal.req import parse_requirements
+except ImportError: # for pip <= 9.0.3
+    from pip.req import parse_requirements
+
 from setuptools import find_packages
 from setuptools import setup
 from setuptools.command.install import install as _install
 
 import os
-if not os.path.exists('darknet'):
+if not os.path.exists('keras-retinanet'):
 	os.system('git clone https://github.com/fizyr/keras-retinanet.git')
 	os.chdir('keras-retinanet')
-	os.system('pip install .')
+	os.system('pip install . --user')
 	os.system('python setup.py build_ext --inplace')
-	
+	os.chdir('..')
+	os.system('mv keras-retinanet kr')
+	os.system('mv kr/keras-retinanet .')
+	os.system('mv kr/build .')
+
+if not os.path.exists('darknet'):
 	os.system('git clone https://github.com/AlexeyAB/darknet.git')
 	os.chdir('darknet')
 	os.system("sed -i 's/LIBSO=0/LIBSO=1/g' Makefile")

@@ -23,11 +23,11 @@ import logging
 # create logger
 logger = logging.getLogger(os.path.basename(__file__))
 #logger.setLevel(logging.INFO)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 # create console handler with a higher log level
 ch = logging.StreamHandler()
 #ch.setLevel(logging.INFO)
-ch.setLevel(logging.DEBUG)
+ch.setLevel(logging.INFO)
 
 # create file handler which logs even debug messages
 fh = logging.FileHandler(os.path.basename(__file__)+'.log')
@@ -55,21 +55,15 @@ def get_session():
 # use this environment flag to change which GPU to use
 #os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
-def initialize(MODEL='.cfg/bwh_model.h5'):
-    """
-    set the modified tf session as backend in keras
-    keras.backend.tensorflow_backend.set_session(get_session())
 
-     adjust this to point to your downloaded/trained model
-     models can be downloaded here: https://github.com/fizyr/keras-retinanet/releases
-     model_path = os.path.join('snapshots', 'resnet50_csv_09.h5')
-    """
-    model_path = MODEL
-    # load retinanet model
-    global model = models.load_model(model_path, backbone_name='resnet50')
+keras.backend.tensorflow_backend.set_session(get_session())
+model_path = 'cfg/bwh_model.h5'
+# load retinanet model
+bwh_model = models.load_model(model_path, backbone_name='resnet50')
+logger.debug(bwh_model)
+graph = tf.get_default_graph()
 
-
-def performDetect(imagePath="test.jpg", output="output.jpg" thresh= 0.5):
+def performDetect(imagePath="test.jpg", output="output.jpg", thresh= 0.81):
     """
     """
     # load image
@@ -85,7 +79,8 @@ def performDetect(imagePath="test.jpg", output="output.jpg" thresh= 0.5):
 
     # process image
     start = time.time()
-    boxes, scores, labels = model.predict_on_batch(np.expand_dims(image, axis=0))
+    with graph.as_default():
+        boxes, scores, labels = bwh_model.predict_on_batch(np.expand_dims(image, axis=0))
     logger.debug("processing time: {}".format( time.time() - start))
 
     # correct for image scale
@@ -101,7 +96,7 @@ def performDetect(imagePath="test.jpg", output="output.jpg" thresh= 0.5):
         1: wasps,
         2: hornets
     }
-
+    logger.info("Actual run found:")
     for box, score, label in zip(boxes[0], scores[0], labels[0]):
         # scores are sorted so we can break
         if score < thresh:
@@ -117,9 +112,10 @@ def performDetect(imagePath="test.jpg", output="output.jpg" thresh= 0.5):
 
         tuple = (score, box)
         (result_objects.get(label)).append(tuple)
-        logger.info("found {} {}%".format(labels_to_names.get(get),str(np.rint(100 * score))))
+        logger.info("found {} {}%".format(labels_to_names.get(label),str(np.rint(100 * score))))
 
     draw2 = draw.copy()
     draw2 = cv2.cvtColor(draw, cv2.COLOR_RGB2BGR)
 
-    cv2.imwrite(OUTPUT, draw2)
+    cv2.imwrite(output, draw2)
+    return result_objects
