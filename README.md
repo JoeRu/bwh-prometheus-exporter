@@ -53,3 +53,8 @@ Please note that using this code is some sort of CPU and Memory-Consuming. This 
 %MEM %CPU COMMAND
  0.7  7.9 python bwh/bwh_exporter.py -p ... -w ...
  ```
+
+So this is a snapshot of the memory- and CPU-usage of the retinanet-python on the same System; So you see accuracy needs much more Mem and CPU.
+```
+ %MEM %CPU COMMAND
+  1.8 35.3 python bwh/bwh_exporter_retinanet.py -p 8004 -w ...
