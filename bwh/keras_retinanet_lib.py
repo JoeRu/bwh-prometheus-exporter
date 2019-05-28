@@ -63,7 +63,7 @@ bwh_model = models.load_model(model_path, backbone_name='resnet50')
 logger.debug(bwh_model)
 graph = tf.get_default_graph()
 
-def performDetect(imagePath="test.jpg", output="output.jpg", thresh= 0.81):
+def performDetect(imagePath="test.jpg", output="output.jpg", thresh= 0.94):
     """
     """
     # load image

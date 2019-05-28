@@ -11,12 +11,8 @@ import os
 if not os.path.exists('keras-retinanet'):
 	os.system('git clone https://github.com/fizyr/keras-retinanet.git')
 	os.chdir('keras-retinanet')
-	os.system('pip install . --user')
-	os.system('python setup.py build_ext --inplace')
-	os.chdir('..')
-	os.system('mv keras-retinanet kr')
-	os.system('mv kr/keras-retinanet .')
-	os.system('mv kr/build .')
+	os.system('sudo pip install .')
+	os.system('sudo python setup.py install')
 
 if not os.path.exists('darknet'):
 	os.system('git clone https://github.com/AlexeyAB/darknet.git')
